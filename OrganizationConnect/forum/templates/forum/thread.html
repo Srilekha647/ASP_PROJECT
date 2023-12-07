@@ -1,0 +1,102 @@
+{% extends "layout/default.html" %}
+
+{% load static %}
+{% load user_filters %}
+{% load crispy_forms_tags %}
+
+ 
+{% csrf_token %}
+{% crispy form %}
+
+{% block subtitle %}{{ thread.title }}{% endblock %}
+
+{% block content %}
+	<div class="container">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+			 
+				<li class="breadcrumb-item"><a href="{% url 'forum-index' %}">Forums</a></li>
+				<li class="breadcrumb-item"><a href="{% url 'forum-subcategory' subcategory_name=thread.subcategory.title %}">{{ thread.subcategory.title }}</a></li>
+				<li class="breadcrumb-item active" aria-current="page">{{ thread.title }}</li>
+			</ol>
+		</nav>
+        {% csrf_token %}
+		{% for message in page %}
+			<div class="card" {% if forloop.counter == 1 %}style="background: var(--background-gray);"{% endif %}>
+				<div class="card-body">
+                    {% if forloop.counter == 1 %}
+                        <h3><span class="badge" style="background: #{{ thread.prefix.color }};color:white;">{{ thread.prefix.name }}</span> {{ thread.title }}</h3>
+                        <hr>
+                    {% endif %}
+					<div class="row">
+						<div class="col-6 col-md-3 text-center">
+                            <div style="border: 1px solid lightgray;padding:1rem;border-radius: 5px;">
+                                <img src="{{ message.author|avatar }}" class="img-fluid avatar" alt="{{ message.author.username }}'s avatar"><br>
+                                <h5><a href="{% url "members-profile" username=message.author.username %}">{{ message.author }}</a></h5>
+                                {% for group in message.author.groups.all %}
+                                    {% if forloop.counter == 1 %}{% endif %}
+                                    <h6><span class="badge badge-primary">{{ group }}</span></h6>
+                                {% endfor %}
+                            </div>
+						</div>
+						<div class="col-6 col-md-9">
+							<p>{{ message.content|safe }}</p>
+							<hr>
+							<small><a href="{% url "members-profile" username=message.author.username %}">{{ message.author }}</a>, posted on {{ message.date_posted }} {% if message.date_edited is not null %}(last edited: {{ message.date_edited }}){% endif %}
+                                {% if message.author == request.user %}[ <a href="{% url 'forum-message-edit' message_id=message.pk %}">Edit</a> ] [ <a href="{% url 'forum-message-remove' message_id=message.pk %}">Remove</a> ]{% endif %}
+                                <span class="float-right">
+                                    <a {% if message.author != user %}id="up-{{ message.pk }}"{% endif %} class="text-success"><span id="up-place-{{ message.pk }}">{{ message.upvoters.count }}</span> <i class="fas fa-chevron-up"></i></a>
+                                    <a {% if message.author != user %}id="down-{{ message.pk }}"{% endif %} class="text-danger"><span id="down-place-{{ message.pk }}">{{ message.downvoters.count }}</span> <i class="fas fa-chevron-down"></i></a>
+                                </span>
+                            </small>
+                        </div>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+        {% include "components/pagination.html" with center=True hideable=True %}
+        {% if user.is_authenticated %}
+            <script>
+                function update(data) {
+                    $("#up-place-" + data['pk']).text(data['upvoters']);
+                    $("#down-place-" + data['pk']).text(data['downvoters']);
+                }
+                $(document).ready(function() {
+                    let csrftoken = '{{ csrf_token }}';
+                    $("a[id*='up'], a[id*='down']").click(function() {
+                        $.ajax({
+                            type: "POST",
+                            url: '{% url "forum-message-rate" %}',
+                            headers:{'X-CSRFToken':csrftoken},
+                            data: {
+                                'pk': this.id.split("-")[1],
+                                'value': this.id.split("-")[0] === "up" ? 1 : -1,
+                            },
+                            success: function(data) {
+                                update(data);
+                            },
+                            dataType: 'json'
+                        });
+                    });
+                });
+            </script>
+        {% endif %}
+        <div class="card">
+            <div class="card-body">
+                {% if user.is_authenticated %}
+                    {% if thread.locked and not perms.forum.locked_thread_reply %}
+                        Thread is locked, you cannot reply to it.
+                    {% else %}
+                        <form action="{% url 'forum-thread-reply' thread_title=thread.title %}" method="post">
+                            {% csrf_token %}
+                            {{ form|crispy }}
+                            <button class="btn btn-primary" type="submit">Reply</button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    You need to be logged in in order to post a message.
+                {% endif %}
+            </div>
+        </div>
+	</div>
+{% endblock %}

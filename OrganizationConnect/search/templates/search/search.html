@@ -1,0 +1,108 @@
+{% extends "layout/default.html" %}
+
+{% load static %}
+{% load user_filters %}
+
+{% block subtitle %}Searching '{{ keyword }}'{% endblock %}
+
+{% block content %}
+	<div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url "index" %}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Search</li>
+                <li class="breadcrumb-item active" aria-current="page">{{ keyword }}</li>
+            </ol>
+        </nav>
+		<div class="row">
+			<div class="col-12 col-md-9">
+                <div class="card">
+                    <div class="card-body">
+                        <h3>Search</h3>
+                        Searching for '{{ keyword }}'.
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">Related threads</div>
+                    <div class="card-body">
+                        {% if related_threads|length == 0 %}
+                            No threads related to the query could be found.
+                        {% else %}
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Thread title</th>
+                                            <th scope="col">Author</th>
+                                            <th scope="col">Time started</th>
+                                            <th scope="col">Last reply</th>
+                                            <th scope="col">Last reply time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for thread in related_threads %}
+                                            <tr>
+                                                <td><span class="badge" style="background: #{{ thread.prefix.color }};color:white;">{{ thread.prefix.name }}</span> <a href="{% url 'forum-thread' thread_title=thread.title %}">{{ thread.title }}</a></td>
+                                                <td><img src="{{ thread.author|avatar }}" class="img-fluid avatar-mini" alt="{{ thread.author.username }}'s avatar"> <a href="{% url "members-profile" username=thread.author.username %}">{{ thread.author }}</a></td>
+                                                <td>{{ thread.get_first_message.date_posted }}</td>
+                                                <td>{% if thread.get_last_message == thread.get_first_message  %}/{% else %}<img src="{{ thread.get_last_message.author|avatar }}" class="img-fluid avatar-mini" alt="{{ subcategory.get_latest_thread.author.username }}'s avatar"> <a href="{% url "members-profile" username=thread.get_last_message.author.username %}">{{ thread.get_last_message.author }}</a>{% endif %}</td>
+                                                <td>{% if thread.get_last_message == thread.get_first_message  %}/{% else %}{{ thread.get_last_message.date_posted }}{% endif %}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card">
+                        <div class="card-header">Related messages</div>
+                        <div class="card-body">
+                            {% if related_messages|length == 0 %}
+                                No threads related to the query could be found.
+                            {% else %}
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Message</th>
+                                                <th scope="col">Thread</th>
+                                                <th scope="col">Author</th>
+                                                <th scope="col">Time posted</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for message in related_messages %}
+                                                <tr>
+                                                    <td>{{ message.content|striptags|truncatewords:5 }}</td>
+                                                    <td><span class="badge" style="background: #{{ message.thread.prefix.color }};color:white;">{{ message.thread.prefix.name }}</span> <a href="{% url 'forum-thread' thread_title=message.thread.title %}">{{ message.thread.title }}</a></td>
+                                                    <td><img src="{{ message.author|avatar }}" class="img-fluid avatar-mini" alt="{{ message.author.username }}'s avatar"> <a href="{% url "members-profile" username=message.author.username %}">{{ message.author.username }}</a></td>
+                                                    <td>{{ message.date_posted }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+			</div>
+			<div class="col-12 col-md-3">
+                <div class="card">
+                    <div class="card-header">Related users</div>
+                    <div class="card-body">
+                        {% if related_users|length == 0 %}
+                            No users related to the query could be found.
+                        {% endif %}
+                        {% for user in related_users %}
+                            <img src="{{ user|avatar }}" class="img-fluid avatar-mini" alt="{{ user.username }}'s avatar"> <a href="{% url "members-profile" username=user.username %}">{{ user.username }}</a>
+                            {% if not forloop.last %}
+                                <hr>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %} Home | Organisation Connect{% endblock title %}
+
+{% load static %}
+{% block content %}
+    
+    <!--carousel-hero-->
+    <section class="section carousel-hero">
+        {% if featured %}
+        <div class="owl-carousel">
+            {% for post in featured %}
+            <div class="hero d-flex align-items-center " style="background-image: url({{post.thumbnail.url}})">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-8 offset-lg-2 col-md-10 offset-md-1">
+                            <div class="hero-content">
+                                <a href="{{post.category.get_absolute_url}}" class="categorie">{{post.category}}</a>
+                                <h2>
+                                    <a href="{{post.get_absolute_url}}">{{post.title}}</a>
+                                </h2>
+            
+                                <div class="post-card-info">
+                                    <ul class="list-inline">
+                                        <li>
+                                            <a href="{% url 'magazine:author' post.author.user.username%}">
+                                                <img src="{{post.author.avatar.url}}" alt="{{ post.author.user.username }}'s profile picture">
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="{% url 'magazine:author' post.author.user.username%}">{{post.author.full_name}}</a>
+                                        </li>
+                                        <li class="dot"></li>
+                                        <li>{{post.publish | date}}</li>
+                                        <li class="dot"></li>
+                                        <li>{{ post.comments.count }} comment{{ post.comments | pluralize }}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </section>
+    <!--/-->
+
+    <!--masonry-layout-->
+    <section class="mt-40 masonry-layout">
+        <div class="container-fluid">
+        {% if posts %}
+            <div class="row"  data-aos="fade-up" data-aos-duration="3000">
+                <div class="col-lg-12">
+                    <div class="card-columns">
+                        <!--Post-1-->
+                        
+                        {% for post in posts %}
+                        <div class="card">
+                            <div class="post-card">
+                                <div class="post-card-image">
+                                    <a href="{{post.get_absolute_url}}">
+                                    <img src="{{post.thumbnail.url}}" alt="">
+                                    </a>
+                                    
+                                </div>
+                                <div class="post-card-content">
+                                    <a href="{{post.category.get_absolute_url}}" class="categorie"> {{post.category}}</a>
+                                    <h5>
+                                        <a href="{{post.get_absolute_url}}">{{post.title}}</a>
+                                    </h5>
+                                    <p>{{post.overview | truncatewords_html:13|safe}}</p>
+                                    <div class="post-card-info">
+                                        <ul class="list-inline">
+                                            <li>
+                                                <a href="{% url 'magazine:author' post.author.user.username%}">
+                                                    <img src="{{post.author.avatar.url}}" alt="{{ post.author.user.username }}'s profile picture">
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="{% url 'magazine:author' post.author.user.username%}">{{post.author.full_name}}</a>
+                                            </li>
+                                            <li class="dot"></li>
+                                            <li>{{post.publish | date}}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <!--/-->
+    
+
+                    </div>
+                    <!--pagination-->
+                    <div class="mt-30 text-center text-upper mb-30">
+                        <a href="{% url 'magazine:post_list' %}" class="btn btn-primary">More Posts <i class="fa fa-chevron-right pl-2"></i></a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center my-5">
+			    <img src="{% static 'dashboard/assets/img/illustrations/not_found_60pq.svg' %}" class="pb-3" alt="">
+                <h2>No Post Available for Now.</h2>
+            </div>
+        {% endif %}
+        </div>
+    </section>
+    <!--/-->
+
+
+    <!--newsletter-->
+    {% include 'newsletter.html' %}
+
+{% endblock content %}

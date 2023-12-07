@@ -1,0 +1,109 @@
+{% extends "dashboard/layouts/base.html" %}
+
+{% block title %} Add Category {% endblock %} 
+{% load static %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+	{{ block.super }}
+{% endblock stylesheets %}
+
+{% block content %}
+
+		<main class="content">
+			{% include 'dashboard/includes/navigation.html' %}
+
+			<!-- Add Button -->
+			<div class="py-4">
+				<div class="dropdown">
+					<button class="btn btn-gray-800 d-inline-flex align-items-center me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<span class="icon icon-xs me-2">
+							<i class="fas fa-plus"></i>
+						</span>
+						Add New..
+					</button>
+					<div class="dropdown-menu dashboard-dropdown dropdown-menu-start mt-2 py-1">
+						<a class="dropdown-item d-flex align-items-center" href="write_article.html">
+							<span class="dropdown-icon text-gray-400 me-2 ">
+								<i class="fas fa-feather-alt"></i>
+							</span>
+						 Add Article
+						</a>
+						<a class="dropdown-item d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalTag">
+							<span class="dropdown-icon text-gray-400 me-2 ">
+								<i class="fas fa-tags"></i>
+							</span>
+							 Add Tag
+						</a>
+					</div>
+				</div>
+			</div>
+			<!-- xxxxxxxxxxxx -->
+
+			<!-- Table Card -->
+			<div class="card border-0 shadow mx-auto">
+				<div class="card-body">
+					<div class="table-responsive">
+						<table class="table table-centered table-nowrap mb-0 rounded" >
+							<thead class="thead-light">
+								<tr>
+									<th class="border-0 rounded-start" id="category">Tag</th>
+									<th class="border-0" id="edit">Edit</th>
+									<th class="border-0 rounded-end" id="delete">Delete</th>
+								</tr>
+							</thead>
+							<tbody>
+								<!-- Item -->
+								{% for tag in tags %}
+								<tr>
+									<td class="border-0">
+										<a href="#" class="d-flex align-items-center">
+											<div><span class="h6">{{ tag.name }}</span></div>
+										</a>
+									</td>
+									<td class="border-0 font-weight-bold">
+										<a href="" class="action-btn btn btn-success" data-bs-toggle="tooltip" data-bs-placement="top" title="Not working">
+											<i class="fas fa-pen-alt"></i>
+										</a>
+									</td>
+									<td class="border-0">
+										<a href="" class="action-btn btn btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Not working">
+											<span class="font-weight-bold">
+												<i class="fas fa-trash-alt"></i>
+											</span>
+										</a>
+									</td>
+								</tr>
+								{% endfor %}
+								<!-- End of Item -->
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<!-- xxxxxxxxxxxxxxxxxxxx -->
+
+        </main>
+
+		<!-- Modal Content -->
+		<div class="modal fade" id="modalTag" tabindex="-1" role="dialog" aria-labelledby="modalTitleTag" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+				<div class="modal-content py-xl-4">
+					<div class="modal-body text-center py-3">
+						<i class="fas fa-tags fa-3x"></i>
+						<h3 class="modal-title mb-3" id="modalTitleTag">Add New Tag</h3>
+						<div class="form-group px-lg-5">
+							<form action="">
+								<div class="d-flex mb-3 justify-content-center">
+									<input type="text" id="tag" class="me-sm-1 mb-sm-0 form-control form-control-lg border-gray-300" placeholder="example: Fashion, Financial, Travel...">
+									<div>
+										<button type="submit" class="ms-2 btn large-form-btn btn-primary">Save</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End of Modal Content -->
+		{% endblock content %}

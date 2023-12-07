@@ -1,0 +1,83 @@
+{% extends "layout/default.html" %}
+
+{% load static %}
+{% load user_filters %}
+
+{% load crispy_forms_tags %}
+{% csrf_token %}
+{% crispy form %}
+
+{% block subtitle %}{{ subcategory.title }}{% endblock %}
+
+{% block content %}
+	<div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+          
+                <li class="breadcrumb-item"><a href="{% url 'forum-index' %}">Forums</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ subcategory.title }}</li>
+            </ol>
+        </nav>
+		<div class="card">
+			<div class="card-body">
+                <h3>{{ subcategory.title }}</h3>
+                <p>{{ subcategory.description }}</p>
+                <hr>
+                <div class="float-right">
+                    {% if user.is_authenticated %}
+                        {% if subcategory.category.staff_only and not perms.forum.create_thread_in_staff_only %}
+                            <small>(You have insufficient permissions to create a thread here.)</small>
+                        {% else %}
+                            <a class="btn btn-primary" href="{% url 'forum-thread-create' subcategory_name=subcategory.title %}">Create a new thread</a>
+                        {% endif %}
+                    {% else %}
+                        <small>(You need to be logged in order to create a thread.)</small>
+                    {% endif %}
+                </div>
+                {% include "components/pagination.html" %}
+				{% if not page.object_list %}
+                    <hr>
+					There are no threads in this subcategory yet.
+                    <hr>
+				{% else %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Thread title</th>
+                                    <th scope="col">Author</th>
+                                    <th scope="col">Time started</th>
+                                    <th scope="col">Last reply</th>
+                                    <th scope="col">Last reply time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for thread in page.object_list %}
+                                    <tr>
+                                        <td>{% if thread.pinned %}<i class="fas fa-thumbtack mr-1" style="transform: rotate(45deg);"></i>{% endif %}<span class="badge" style="background: #{{ thread.prefix.color }};color:white;">{{ thread.prefix.name }}</span> <a href="{% url 'forum-thread' thread_title=thread.title %}">{{ thread.title }}</a></td>
+                                        <td><img src="{{ thread.author|avatar }}" class="img-fluid avatar-mini" alt="{{ subcategory.get_latest_thread.author.username }}'s avatar"> <a href="{% url "members-profile" username=thread.author.username %}">{{ thread.author }}</a></td>
+                                        <td>{{ thread.get_first_message.date_posted }}</td>
+                                        <td>{% if thread.get_last_message == thread.get_first_message  %}/{% else %}<img src="{{ thread.get_last_message.author|avatar }}" class="img-fluid avatar-mini" alt="{{ subcategory.get_latest_thread.author.username }}'s avatar"> <a href="{% url "members-profile" username=thread.get_last_message.author.username %}">{{ thread.get_last_message.author }}</a>{% endif %}</td>
+                                        <td>{% if thread.get_last_message == thread.get_first_message  %}/{% else %}{{ thread.get_last_message.date_posted }}{% endif %}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+				{% endif %}
+                <div class="float-right">
+                    {% if user.is_authenticated %}
+                        {% if subcategory.category.staff_only and not perms.forum.create_thread_in_staff_only %}
+                            <small>(You have insufficient permissions to create a thread here.)</small>
+                        {% else %}
+                            <a class="btn btn-primary" href="{% url 'forum-thread-create' subcategory_name=subcategory.title %}">Create a new thread</a>
+                        {% endif %}
+                    {% else %}
+                        <small>(You need to be logged in order to create a thread.)</small>
+                    {% endif %}
+                </div>
+                {% include "components/pagination.html" %}
+			</div>
+		</div>
+	</div>
+{% endblock %}

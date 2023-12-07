@@ -1,0 +1,55 @@
+{% extends "layout/default.html" %}
+
+{% load static %}
+{% load user_filters %}
+
+{% block subtitle %}Achievements{% endblock %}
+
+{% block content %}
+	<div class="container">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="{% url "index" %}">Home</a></li>
+				<li class="breadcrumb-item" aria-current="page">Account</li>
+				<li class="breadcrumb-item active" aria-current="page">Achievements</li>
+			</ol>
+		</nav>
+		<div class="row">
+			<div class="col-12 col-md-9">
+				<div class="card">
+					<div class="card-body">
+                        <h3>Unlocked achievements</h3>
+                        {% if request.user.userprofile.get_unlocked_achievements %}
+                            {% for user_achievement in request.user.userprofile.get_unlocked_achievements %}
+                                <hr>
+                                <i class="fas fa-trophy"></i> {{ user_achievement.achievement.name }} <span class="float-right">{{ user_achievement.datetime }}</span><br>
+                                {{ user_achievement.achievement.description }}
+                            {% endfor %}
+                        {% else %}
+                            You haven't unlocked any achievements yet.
+                        {% endif %}
+					</div>
+				</div>
+                <div class="card">
+                    <div class="card-body">
+                        <h3>Locked achievements</h3>
+                        {% if request.user.userprofile.get_locked_achievements %}
+                            <div class="transparent">
+                                {% for achievement in request.user.userprofile.get_locked_achievements %}
+                                    <hr>
+                                    <i class="fas fa-trophy"></i> {{ achievement.name }}<br>
+                                    {{ achievement.description }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            You've unlocked all the achievements.
+                        {% endif %}
+                    </div>
+                </div>
+			</div>
+			<div class="col-12 col-md-3">
+                {% include "members/modules/useful-links.html" %}
+			</div>
+		</div>
+	</div>
+{% endblock %}

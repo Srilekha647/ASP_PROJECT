@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Favicon -->
+        <link rel="apple-touch-icon" sizes="120x120" href="{% static 'img/icon/icon-120x120.png' %}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/icon/favicon-32x32.png' %}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/icon/favicon-16x16.png' %}">
+        <link rel="manifest" href="{% static 'site.webmanifest' %}">
+
+        <!-- Primary Meta Tags -->
+        <title>
+            {% block title %}Author's Dashboard{% endblock %} | Organisation Connect
+        </title>
+
+        <!-- Fontawesome -->
+        <link type="text/css" href="{% static 'dashboard/css/fontawesome.css' %}" rel="stylesheet">
+
+        <!-- Dashboard CSS -->
+        <link type="text/css" href="{% static 'dashboard/css/dashboard.css' %}" rel="stylesheet">
+
+        <!-- Specific Page CSS goes HERE  -->
+        {% block stylesheets %}{% endblock stylesheets %}
+
+    </head>
+
+    <body>
+
+        <nav class="navbar navbar-dark navbar-theme-primary px-4 col-12 d-lg-none">
+			<a class="navbar-brand me-lg-5" href="{% url 'dashboard:dashboard' %}">
+				<img class="navbar-brand-dark" src="{% static 'dashboard/assets/img/brand/logo-white.png' %}" alt="Organisation Connect logo">
+				<img class="navbar-brand-light" src="{% static 'dashboard/assets/img/brand/logo-dark.png' %}" alt="Organisation Connect logo">
+			</a>
+			<div class="d-flex align-items-center">
+				<button class="navbar-toggler d-lg-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+			</div>
+		</nav>
+
+        {% include 'dashboard/includes/sidebar.html' %}
+            
+        {% block content %}
+        
+        {% endblock content %}
+
+        {% include 'dashboard/includes/scripts.html' %}
+    </body>
+
+</html>

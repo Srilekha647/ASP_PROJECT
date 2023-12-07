@@ -1,0 +1,57 @@
+{% extends "layout/default.html" %}
+
+{% load static %}
+{% load user_filters %}
+
+{% block subtitle %}Alerts{% endblock %}
+
+{% block content %}
+	<div class="container">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="{% url "index" %}">Home</a></li>
+				<li class="breadcrumb-item" aria-current="page">Account</li>
+				<li class="breadcrumb-item active" aria-current="page">Alerts</li>
+			</ol>
+		</nav>
+		<div class="row">
+			<div class="col-12 col-md-9">
+				<div class="card">
+					<div class="card-body">
+                        <h3>Alerts</h3>
+                        {% if page %}
+                            <hr>
+                            {% for alert in page %}
+                                {% if alert.type == 'ME' %}
+                                    <i class="fas fa-at"></i> <a href="{% url 'members-profile' username=alert.caused_by %}"><img src="{{ alert.caused_by|avatar }}" class="img-fluid avatar-mini" alt="{{ alert.caused_by.username }}'s avatar"> {{ alert.caused_by.username }}</a> mentioned you in <a href="{% url 'forum-thread' thread_title=alert.thread.title  %}">{{ alert.thread.title }}</a>.<br>
+                                    <small>{{ alert.message|default:"" }} {{ alert.datetime }}</small>
+                                {% elif alert.type == 'RE' %}
+                                    <i class="fas fa-bell"></i> <a href="{% url 'members-profile' username=alert.caused_by %}"><img src="{{ alert.caused_by|avatar }}" class="img-fluid avatar-mini" alt="{{ alert.caused_by.username }}'s avatar"> {{ alert.caused_by.username }}</a> responded to thread <a href="{% url 'forum-thread' thread_title=alert.thread.title  %}">{{ alert.thread.title }}</a>.<br>
+                                    <small>{{ alert.message|default:"" }} {{ alert.datetime }}</small>
+                                {% elif alert.type == 'UP' %}
+                                    <i class="fas fa-chevron-up"></i> <a href="{% url 'members-profile' username=alert.caused_by %}"><img src="{{ alert.caused_by|avatar }}" class="img-fluid avatar-mini" alt="{{ alert.caused_by.username }}'s avatar"> {{ alert.caused_by.username }}</a> upvoted your post <a href="{% url 'forum-thread' thread_title=alert.thread.title  %}">{{ alert.thread.title }}</a>.<br>
+                                    <small>{{ alert.message|default:"" }} {{ alert.datetime }}</small>
+                                {% elif alert.type == 'DO' %}
+                                    <i class="fas fa-chevron-down"></i> <a href="{% url 'members-profile' username=alert.caused_by %}"><img src="{{ alert.caused_by|avatar }}" class="img-fluid avatar-mini" alt="{{ alert.caused_by.username }}'s avatar"> {{ alert.caused_by.username }}</a> downvoted your post <a href="{% url 'forum-thread' thread_title=alert.thread.title  %}">{{ alert.thread.title }}</a>.<br>
+                                    <small>{{ alert.message|default:"" }} {{ alert.datetime }}</small>
+                                {% elif alert.type == 'AC' %}
+                                    <i class="fas fa-trophy"></i> You just got a new achievement!<br>
+                                    <small><a href="{% url 'members-achievement' %}">Click me to view your achievements.</a></small>
+                                {% endif %}
+                                {% if not forloop.last %}
+                                    <hr>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            You do not have any alerts.
+                        {% endif %}
+                        {% include "components/pagination.html" with center=True upper_border=True hideable=True %}
+					</div>
+				</div>
+			</div>
+			<div class="col-12 col-md-3">
+                {% include "members/modules/useful-links.html" %}
+			</div>
+		</div>
+	</div>
+{% endblock %}

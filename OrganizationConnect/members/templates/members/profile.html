@@ -1,0 +1,89 @@
+{% extends "layout/default.html" %}
+
+{% load static %}
+{% load user_filters %}
+
+{% block subtitle %}{{ passed_user.username }}'s profile{% endblock %}
+
+{% block content %}
+	<div class="container">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="{% url "index" %}">Home</a></li>
+				<li class="breadcrumb-item"><a href="{% url "members-members" %}">Members</a></li>
+				<li class="breadcrumb-item active" aria-current="page">{{ passed_user.username }}'s Profile</li>
+			</ol>
+		</nav>
+		<div class="row">
+			<div class="col-12 col-md-3">
+				<div class="card">
+					<div class="card-body">
+						<div class="text-center">
+                            <img src="{{ passed_user|avatar }}" class="avatar-big img-fluid" alt="{{ passed_user.username }}'s avatar">
+							<hr>
+							<h3>{{ passed_user.username }}</h3>
+                            <p>
+                                {{ passed_user|reputation }}
+                                <small>(
+                                    <span class="text-success ">{{ passed_user.userprofile.get_upvote_count }} <i class="fas fa-chevron-up"></i></span>
+                                    <span class="text-danger ">{{ passed_user.userprofile.get_downvote_count }} <i class="fas fa-chevron-down"></i></span>
+                                )</small>
+                            </p>
+							{% for group in passed_user.groups.all %}
+								{% if forloop.counter == 1 %}
+									<hr>
+								{% endif %}
+								<h4><span class="badge badge-primary">{{ group }}</span></h4>
+							{% endfor %}
+							<hr>
+						</div>
+                        Registration: {{ passed_user.date_joined|date:"d.m.Y" }}<br>
+                        Threads started: {{ passed_user.userprofile.get_thread_count }}<br>
+                        Messages posted: {{ passed_user.userprofile.get_post_count }}<br>
+                        Achievements: {{ passed_user.userprofile.get_unlocked_achievements.count }}<br>
+					</div>
+				</div>
+			</div>
+			<div class="col-12 col-md-9">
+				<div class="card mb-0">
+					<div class="card-header">Description</div>
+					<div class="card-body">
+						{{ passed_user.userprofile.description|safe }}
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-12 col-md-6">
+						<div class="card">
+							<div class="card-header">Recent posts</div>
+							<div class="card-body">
+                                {% if recent_posts %}
+                                    {% for recent_post in recent_posts %}
+                                        {% if forloop.counter is not 1 %}<hr>{% endif %}
+                                        <img src="{{ recent_post.thread.author|avatar }}" class="avatar-mini" alt="{{ recent_post.thread.author.username }}'s avatar"> <a href="{% url 'forum-thread' thread_title=recent_post.thread.title %}">{{ recent_post.thread.title }}</a><br><small>Subcategory: {{ recent_post.thread.subcategory }}<br>{{ recent_post.date_posted }}</small>
+                                    {% endfor %}
+                                {% else %}
+                                    This user doesn't have any recent posts yet.
+                                {% endif %}
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-md-6">
+						<div class="card">
+							<div class="card-header">Recent threads</div>
+							<div class="card-body">
+                                {% if recent_threads %}
+                                    {% for recent_thread in recent_threads %}
+                                        {% if forloop.counter is not 1 %}<hr>{% endif %}
+                                        <img src="{{ recent_thread.author|avatar }}" class="avatar-mini" alt="{{ recent_thread.author.username }}'s avatar"> <a href="{% url 'forum-thread' thread_title=recent_thread.title %}">{{ recent_thread.title }}</a><br><small>Subcategory: {{ recent_thread.subcategory }}<br>{{ recent_thread.get_first_message.date_posted }}</small>
+                                    {% endfor %}
+                                {% else %}
+                                    This user doesn't have any recent threads yet.
+                                {% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

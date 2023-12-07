@@ -1,0 +1,25 @@
+{% extends 'layout/auth.html' %}
+
+{% block subtitle %}Logout{% endblock %}
+
+{% block card-body %}
+	<h3>Logging out...</h3>
+	<p>Please wait another <span id="seconds-left">3</span> second(s).</p>
+	<script>
+        $(document).ready(function() {
+            let span = $("#seconds-left");
+            let left = span.text();
+
+            setInterval(function() {
+                span.text(--left);
+                if (left <= 0) {
+                    window.location.href="{% url "index" %}";
+                }
+            }, 1000);
+        });
+    </script>
+{% endblock %}
+
+{% block card-under %}
+	Haven't been redirected yet? <a href="{% url "index" %}" class="light">Click here</a>!
+{% endblock %}
